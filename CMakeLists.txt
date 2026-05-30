@@ -37,12 +37,39 @@ include_directories(
 )
 
 file(GLOB_RECURSE DIR_TEST_SRCS "test.cpp")
+file(GLOB_RECURSE DIR_FISHEYE_SRCS "fisheye_undistort.cpp")
+file(GLOB_RECURSE DIR_FISHEYE_CALIB_SRCS "fisheye_calibrate.cpp")
 file(GLOB_RECURSE OPENCV_LIB "${PROJECT_SOURCE_DIR}/third_party/opencv/lib/opencv_world480.lib") 
 
-set(all_files ${DIR_TEST_SRCS})
+set(all_files ${DIR_TEST_SRCS} ${DIR_FISHEYE_SRCS} ${DIR_FISHEYE_CALIB_SRCS})
 source_group_by_dir(all_files)
 
-add_executable(demo ${DIR_TEST_SRCS}) 
+add_executable(demo ${DIR_TEST_SRCS})
 target_link_libraries(demo ${OPENCV_LIB})
+
+add_executable(fisheye_undistort ${DIR_FISHEYE_SRCS})
+target_link_libraries(fisheye_undistort ${OPENCV_LIB})
+
+add_executable(fisheye_calibrate ${DIR_FISHEYE_CALIB_SRCS})
+target_link_libraries(fisheye_calibrate ${OPENCV_LIB})
+
+set(OPENCV_DLL "${PROJECT_SOURCE_DIR}/third_party/opencv/bin/opencv_world480.dll")
+if (WIN32 AND EXISTS "${OPENCV_DLL}")
+	add_custom_command(TARGET demo POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${OPENCV_DLL}"
+			"$<TARGET_FILE_DIR:demo>/opencv_world480.dll"
+	)
+	add_custom_command(TARGET fisheye_undistort POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${OPENCV_DLL}"
+			"$<TARGET_FILE_DIR:fisheye_undistort>/opencv_world480.dll"
+	)
+	add_custom_command(TARGET fisheye_calibrate POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${OPENCV_DLL}"
+			"$<TARGET_FILE_DIR:fisheye_calibrate>/opencv_world480.dll"
+	)
+endif()
 
 set(CMAKE_BUILD_TYPE=Debug)

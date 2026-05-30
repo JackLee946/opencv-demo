@@ -90,7 +90,7 @@ int main()
 #else
 int main() {
     // 创建一个VideoCapture对象来打开默认摄像头
-    cv::VideoCapture cap(0); // 参数0通常是默认摄像头
+    cv::VideoCapture cap(1); // 参数0通常是默认摄像头
 
     if (!cap.isOpened()) {
         std::cerr << "Error: open camera failed" << std::endl;
